@@ -22,3 +22,5 @@ logs/
 .idea/
 .vscode/
 huggingface_cache/
+!data/chroma_db/chroma.sqlite3
+!data/processed/bm25_index.pkl
