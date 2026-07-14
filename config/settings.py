@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     BM25_TOP_K: int = 6
     RERANK_TOP_K: int = 5
     MINIMUM_RERANK_SCORE: float = 0.20
-    MAX_CONTEXT_CHARACTERS: int = 18000
+    MAX_CONTEXT_CHARACTERS: int = 8000
     MAX_FILE_SIZE_MB: int = 25
     ENABLE_QUERY_REWRITING: bool = False
     ENABLE_LOGGING: bool = False
