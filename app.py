@@ -84,12 +84,6 @@ st.markdown("##### Grounded Healthcare & Wellness Policy Assistant")
 # Sidebar configuration
 with st.sidebar:
     st.markdown("### ⚙️ Settings & Controls")
-    
-    # Check for Groq API Key
-    if not settings.GROQ_API_KEY:
-        st.warning("⚠️ GROQ_API_KEY environment variable is not configured. LLM generation is disabled.")
-    else:
-        st.success("🟢 API Key is configured")
         
     # Get index status
     stats = index_manager.get_stats()
@@ -207,7 +201,9 @@ if query_to_run:
         st.markdown(query_to_run)
         
     with st.chat_message("assistant"):
-        # Processing status spinner
+        response_obj = None
+        error_to_show = None
+        
         with st.status("🔍 Processing query...", expanded=True) as status_indicator:
             try:
                 # Execute answer generation
@@ -215,26 +211,24 @@ if query_to_run:
                     query=query_to_run,
                     filter_sources=selected_sources
                 )
-                
-                # Update status indicator
                 status_indicator.update(label="Response generated successfully!", state="complete", expanded=False)
-                
-                # Generate full formatted markdown
-                formatted_markdown = format_response_as_markdown(response_obj)
-                
-                # Show Response
-                st.markdown(formatted_markdown)
-                
-                # Append response to session history
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": formatted_markdown
-                })
-
             except ChatbotException as ce:
                 status_indicator.update(label="Processing failed.", state="error")
-                st.error(f"Error processing question: {str(ce)}")
+                error_to_show = f"Error processing question: {str(ce)}"
             except Exception as e:
                 status_indicator.update(label="Internal server error.", state="error")
-                st.error("An unexpected error occurred. Please contact the administrator.")
+                error_to_show = "An unexpected error occurred. Please contact the administrator."
                 logger.error(f"Unhandled app exception: {str(e)}", exc_info=True)
+                
+        if response_obj:
+            # Generate full formatted markdown
+            formatted_markdown = format_response_as_markdown(response_obj)
+            # Show Response directly on page
+            st.markdown(formatted_markdown)
+            # Append response to session history
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": formatted_markdown
+            })
+        elif error_to_show:
+            st.error(error_to_show)
