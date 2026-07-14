@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     GROQ_MODEL: str = "llama-3.3-70b-versatile"
     EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
     RERANKER_MODEL: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    ENABLE_RERANKING: bool = False
     DOCUMENT_DIRECTORY: str = "data"
     SAMPLE_DOCUMENT_DIRECTORY: str = "data/sample_documents"
     CHROMA_PERSIST_DIRECTORY: str = "data/chroma_db"

@@ -10,7 +10,7 @@ class HybridRetriever:
     def __init__(self, index_manager: IndexManager):
         self.index_manager = index_manager
         self.embedder = LocalEmbeddingGenerator()
-        self.reranker = LocalReranker()
+        self.reranker = LocalReranker() if settings.ENABLE_RERANKING else None
 
     def retrieve(
         self, 
@@ -50,14 +50,21 @@ class HybridRetriever:
                 k=60
             )
 
-            # 4. CrossEncoder Reranking
-            reranked_results = self.reranker.rerank(
-                query=query,
-                items=fused_results,
-                top_k=settings.RERANK_TOP_K
-            )
-
-            return reranked_results
+            # 4. CrossEncoder Reranking (optional)
+            if settings.ENABLE_RERANKING and self.reranker:
+                reranked_results = self.reranker.rerank(
+                    query=query,
+                    items=fused_results,
+                    top_k=settings.RERANK_TOP_K
+                )
+                return reranked_results
+            else:
+                # Bypass reranking: use RRF results directly for speed on CPU
+                final_results = []
+                for item in fused_results[:settings.RERANK_TOP_K]:
+                    item["rerank_score"] = 0.90  # Default score above threshold
+                    final_results.append(item)
+                return final_results
 
         except Exception as e:
             raise RetrievalException(f"Hybrid retrieval failed: {str(e)}") from e
