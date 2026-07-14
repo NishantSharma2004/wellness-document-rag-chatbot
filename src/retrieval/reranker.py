@@ -8,8 +8,12 @@ class LocalReranker:
     @classmethod
     def get_model(cls) -> CrossEncoder:
         if cls._model_instance is None:
-            # Load the CrossEncoder model once
-            cls._model_instance = CrossEncoder(settings.RERANKER_MODEL)
+            import torch
+            # Optimize CPU threading for shared cloud instances (prevents CPU contention)
+            if torch.get_num_threads() > 1:
+                torch.set_num_threads(1)
+            # Load the CrossEncoder model once on CPU explicitly
+            cls._model_instance = CrossEncoder(settings.RERANKER_MODEL, device="cpu")
         return cls._model_instance
 
     def rerank(self, query: str, items: List[Dict[str, Any]], top_k: int = 5) -> List[Dict[str, Any]]:

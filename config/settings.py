@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     BM25_INDEX_PATH: str = "data/processed/bm25_index.pkl"
     CHUNK_SIZE: int = 900
     CHUNK_OVERLAP: int = 150
-    SEMANTIC_TOP_K: int = 12
-    BM25_TOP_K: int = 12
+    SEMANTIC_TOP_K: int = 6
+    BM25_TOP_K: int = 6
     RERANK_TOP_K: int = 5
     MINIMUM_RERANK_SCORE: float = 0.20
     MAX_CONTEXT_CHARACTERS: int = 18000

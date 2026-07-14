@@ -8,8 +8,12 @@ class LocalEmbeddingGenerator:
     @classmethod
     def get_model(cls) -> SentenceTransformer:
         if cls._model_instance is None:
-            # Load the model locally and reuse it
-            cls._model_instance = SentenceTransformer(settings.EMBEDDING_MODEL)
+            import torch
+            # Optimize CPU threading for shared cloud instances (prevents CPU contention)
+            if torch.get_num_threads() > 1:
+                torch.set_num_threads(1)
+            # Load the model locally and reuse it on CPU explicitly
+            cls._model_instance = SentenceTransformer(settings.EMBEDDING_MODEL, device="cpu")
         return cls._model_instance
 
     def get_embeddings(self, texts: List[str]) -> List[List[float]]:
