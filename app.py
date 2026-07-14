@@ -204,19 +204,16 @@ if query_to_run:
         response_obj = None
         error_to_show = None
         
-        with st.status("🔍 Processing query...", expanded=True) as status_indicator:
+        with st.spinner("🔍 Processing query..."):
             try:
                 # Execute answer generation
                 response_obj = generator.generate_response(
                     query=query_to_run,
                     filter_sources=selected_sources
                 )
-                status_indicator.update(label="Response generated successfully!", state="complete", expanded=False)
             except ChatbotException as ce:
-                status_indicator.update(label="Processing failed.", state="error")
                 error_to_show = f"Error processing question: {str(ce)}"
             except Exception as e:
-                status_indicator.update(label="Internal server error.", state="error")
                 error_to_show = "An unexpected error occurred. Please contact the administrator."
                 logger.error(f"Unhandled app exception: {str(e)}", exc_info=True)
                 
